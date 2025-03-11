@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Детали контракта</h2>
+  <form>
+    {{ contract.name }}
+    {{ contract.service }}
+    {{ contract.document_file }}
+    {{ contract.conclusion_date }}
+    {{ contract.period }}
+    {{ contract.amount }}
+  </form>
+  <button onclick="location.href='{% url 'edit_contract' contract.pk %}'">Редактировать</button>
+  <button onclick="location.href='{% url 'delete_contract' contract.pk %}'">Удалить</button>
+{% endblock %}

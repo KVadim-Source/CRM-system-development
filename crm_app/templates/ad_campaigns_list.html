@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Список рекламных кампаний</h2>
+  <a href="{% url 'create_ad_campaign' %}">Создать новую рекламную кампанию</a>
+  <ul>
+    {% for campaign in campaigns %}
+      <li>
+        <a href="{% url 'ad_campaign_detail' campaign.pk %}">{{ campaign.name }}</a>
+        <button onclick="location.href='{% url 'edit_ad_campaign' campaign.pk %}'">Редактировать</button>
+        <button onclick="location.href='{% url 'delete_ad_campaign' campaign.pk %}'">Удалить</button>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Список услуг</h2>
+  <a href="{% url 'create_service' %}">Создать новую услугу</a>
+  <ul>
+    {% for service in services %}
+      <li>
+        <a href="{% url 'service_detail' service.pk %}">{{ service.name }}</a>
+        <button onclick="location.href='{% url 'edit_service' service.pk %}'">Редактировать</button>
+        <button onclick="location.href='{% url 'delete_service' service.pk %}'">Удалить</button>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Детали услуги</h2>
+  <form>
+    {{ service.name }}
+    {{ service.description }}
+    {{ service.cost }}
+  </form>
+  <button onclick="location.href='{% url 'edit_service' service.pk %}'">Редактировать</button>
+  <button onclick="location.href='{% url 'delete_service' service.pk %}'">Удалить</button>
+{% endblock %}

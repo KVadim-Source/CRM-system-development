@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Список контрактов</h2>
+  <a href="{% url 'create_contract' %}">Создать новый контракт</a>
+  <ul>
+    {% for contract in contracts %}
+      <li>
+        <a href="{% url 'contract_detail' contract.pk %}">{{ contract.name }}</a>
+        <button onclick="location.href='{% url 'edit_contract' contract.pk %}'">Редактировать</button>
+        <button onclick="location.href='{% url 'delete_contract' contract.pk %}'">Удалить</button>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
