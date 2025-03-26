@@ -1,11 +1,34 @@
+from typing import Type
+
 from django import forms
+
+from apps.contracts.models import Contract
+
 from .models import Customer
-from apps.leads.models import Lead
 
 
 class CustomerForm(forms.ModelForm):
-    lead = forms.ModelChoiceField(queryset=Lead.objects.all(), label='Лид')
+    """
+    Форма для создания или редактирования клиента.
+
+    Attributes:
+        contract (ModelChoiceField): Поле выбора контракта.
+    """
+
+    contract = forms.ModelChoiceField(
+        queryset=Contract.objects.all(),
+        required=True,
+        label="Контракт"
+    )
 
     class Meta:
-        model = Customer
-        fields = ['lead', 'advertisement']
+        """
+        Метаданные формы.
+
+        Attributes:
+            model (Type[Customer]): Связанная модель.
+            fields (list[str]): Поля, доступные для редактирования.
+        """
+
+        model: Type[Customer] = Customer
+        fields: list[str] = ["lead", "contract"]

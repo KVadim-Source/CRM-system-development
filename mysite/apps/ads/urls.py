@@ -1,13 +1,32 @@
 from django.urls import path
-from . import views
+
+from .views import (
+    AdvertisementCreateView,
+    AdvertisementDeleteView,
+    AdvertisementDetailView,
+    AdvertisementListView,
+    AdvertisementStatisticView,
+    AdvertisementUpdateView,
+)
 
 app_name = "ads"
 
+
 urlpatterns = [
-    path('', views.advertisement_list, name='advertisement_list'),
-    path('new/', views.advertisement_create, name='advertisement_create'),
-    path('<int:pk>/', views.advertisement_detail, name='advertisement_detail'),
-    path('<int:pk>/edit/', views.advertisement_update, name='advertisement_update'),
-    path('<int:pk>/delete/', views.advertisement_delete, name='advertisement_delete'),
-    path('statistic/', views.advertisement_statistic, name='advertisement_statistic'),
+    path("", AdvertisementListView.as_view(), name="advertisement_list"),
+    path("new/", AdvertisementCreateView.as_view(), name="advertisement_create"),
+    path("<int:pk>/", AdvertisementDetailView.as_view(), name="advertisement_detail"),
+    path(
+        "<int:pk>/edit/", AdvertisementUpdateView.as_view(), name="advertisement_update"
+    ),
+    path(
+        "<int:pk>/delete/",
+        AdvertisementDeleteView.as_view(),
+        name="advertisement_delete",
+    ),
+    path(
+        "statistic/",
+        AdvertisementStatisticView.as_view(),
+        name="advertisement_statistic",
+    ),
 ]
