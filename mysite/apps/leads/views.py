@@ -1,50 +1,95 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import permission_required
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Lead
 from .forms import LeadForm
 
 
-@permission_required('leads.can_view_lead')
-def lead_list(request):
-    leads = Lead.objects.all()
-    return render(request, 'leads-list.html', {'leads': leads})
+class LeadListView(PermissionRequiredMixin, ListView):
+    """
+    Представление для отображения списка потенциальных клиентов.
+
+    Attributes:
+        model (Lead): Модель данных для представления.
+        template_name (str): Шаблон для отображения списка.
+        context_object_name (str): Имя переменной контекста
+        для списка потенциальных клиентов.
+        permission_required (str): Необходимое разрешение
+        для доступа к представлению.
+    """
+    model: Lead = Lead
+    template_name: str = 'leads-list.html'
+    context_object_name: str = 'leads'
+    permission_required: str = 'leads.can_view_lead'
 
 
-@permission_required('leads.can_add_lead')
-def lead_create(request):
-    if request.method == 'POST':
-        form = LeadForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('leads:lead_list')
-    else:
-        form = LeadForm()
-    return render(request, 'leads-create.html', {'form': form})
+class LeadDetailView(PermissionRequiredMixin, DetailView):
+    """
+    Представление для отображения детальной информации о потенциальном клиенте.
+
+    Attributes:
+        model (Lead): Модель данных для представления.
+        template_name (str): Шаблон для отображения детальной информации.
+        context_object_name (str): Имя переменной контекста для потенциального клиента.
+        permission_required (str): Необходимое разрешение для доступа к представлению.
+    """
+    model: Lead = Lead
+    template_name: str = 'leads-detail.html'
+    context_object_name: str = 'object'
+    permission_required: str = 'leads.can_view_lead'
 
 
-@permission_required('leads.can_view_lead')
-def lead_detail(request, pk):
-    lead = get_object_or_404(Lead, pk=pk)
-    return render(request, 'leads-detail.html', {'object': lead})
+class LeadCreateView(PermissionRequiredMixin, CreateView):
+    """
+    Представление для создания нового потенциального клиента.
+
+    Attributes:
+        model (Lead): Модель данных для представления.
+        form_class (LeadForm): Форма для создания нового потенциального клиента.
+        template_name (str): Шаблон для отображения формы создания.
+        permission_required (str): Необходимое разрешение для доступа к представлению.
+        success_url (str): URL для перенаправления после успешного создания.
+    """
+    model: Lead = Lead
+    form_class: LeadForm = LeadForm
+    template_name: str = 'leads-create.html'
+    permission_required: str = 'leads.can_add_lead'
+    success_url: str = reverse_lazy('leads:lead_list')
 
 
-@permission_required('leads.can_change_lead')
-def lead_update(request, pk):
-    lead = get_object_or_404(Lead, pk=pk)
-    if request.method == 'POST':
-        form = LeadForm(request.POST, instance=lead)
-        if form.is_valid():
-            form.save()
-            return redirect('leads:lead_detail', pk=lead.pk)
-    else:
-        form = LeadForm(instance=lead)
-    return render(request, 'leads-edit.html', {'form': form, 'object': lead})
+class LeadUpdateView(PermissionRequiredMixin, UpdateView):
+    """
+    Представление для редактирования существующего потенциального клиента.
+
+    Attributes:
+        model (Lead): Модель данных для представления.
+        form_class (LeadForm): Форма для редактирования потенциального клиента.
+        template_name (str): Шаблон для отображения формы редактирования.
+        context_object_name (str): Имя переменной контекста для потенциального клиента.
+        permission_required (str): Необходимое разрешение для доступа к представлению.
+        success_url (str): URL для перенаправления после успешного редактирования.
+    """
+    model: Lead = Lead
+    form_class: LeadForm = LeadForm
+    template_name: str = 'leads-edit.html'
+    context_object_name: str = 'object'
+    permission_required: str = 'leads.can_change_lead'
+    success_url: str = reverse_lazy('leads:lead_list')
 
 
-@permission_required('leads.can_delete_lead')
-def lead_delete(request, pk):
-    lead = get_object_or_404(Lead, pk=pk)
-    if request.method == 'POST':
-        lead.delete()
-        return redirect('leads:lead_list')
-    return render(request, 'leads-delete.html', {'object': lead})
+class LeadDeleteView(PermissionRequiredMixin, DeleteView):
+    """
+    Представление для удаления потенциального клиента.
+
+    Attributes:
+        model (Lead): Модель данных для представления.
+        template_name (str): Шаблон для отображения подтверждения удаления.
+        context_object_name (str): Имя переменной контекста для потенциального клиента.
+        permission_required (str): Необходимое разрешение для доступа к представлению.
+        success_url (str): URL для перенаправления после успешного удаления.
+    """
+    model: Lead = Lead
+    template_name: str = 'leads-delete.html'
+    context_object_name: str = 'object'
+    permission_required: str = 'leads.can_delete_lead'
+    success_url: str = reverse_lazy('leads:lead_list')

@@ -1,50 +1,93 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import permission_required
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Customer
 from .forms import CustomerForm
 
 
-@permission_required('customers.can_view_customer')
-def customer_list(request):
-    customers = Customer.objects.all()
-    return render(request, 'customers-list.html', {'customers': customers})
+class CustomerListView(PermissionRequiredMixin, ListView):
+    """
+    Представление для отображения списка клиентов.
+
+    Attributes:
+        model (Customer): Модель для отображения.
+        template_name (str): Имя шаблона для отображения.
+        context_object_name (str): Имя переменной контекста для списка клиентов.
+        permission_required (str): Необходимое разрешение для доступа к представлению.
+    """
+    model: Customer = Customer
+    template_name: str = 'customers-list.html'
+    context_object_name: str = 'customers'
+    permission_required: str = 'customers.can_view_customer'
 
 
-@permission_required('customers.can_add_customer')
-def customer_create(request):
-    if request.method == 'POST':
-        form = CustomerForm(request.POST)
-        if form.is_valid():
-            customer = form.save()
-            return redirect('customers:customer_detail', pk=customer.pk)
-    else:
-        form = CustomerForm()
-    return render(request, 'customers-create.html', {'form': form})
+class CustomerDetailView(PermissionRequiredMixin, DetailView):
+    """
+    Представление для отображения детальной информации о клиенте.
+
+    Attributes:
+        model (Customer): Модель для отображения.
+        template_name (str): Имя шаблона для отображения.
+        context_object_name (str): Имя переменной контекста для объекта клиента.
+        permission_required (str): Необходимое разрешение для доступа к представлению.
+    """
+    model: Customer = Customer
+    template_name: str = 'customers-detail.html'
+    context_object_name: str = 'object'
+    permission_required: str = 'customers.can_view_customer'
 
 
-@permission_required('customers.can_view_customer')
-def customer_detail(request, pk):
-    customer = get_object_or_404(Customer, pk=pk)
-    return render(request, 'customers-detail.html', {'object': customer})
+class CustomerCreateView(PermissionRequiredMixin, CreateView):
+    """
+    Представление для создания нового клиента.
+
+    Attributes:
+        model (Customer): Модель для создания.
+        form_class (CustomerForm): Форма для создания клиента.
+        template_name (str): Имя шаблона для отображения.
+        permission_required (str): Необходимое разрешение для доступа к представлению.
+        success_url (str): URL для перенаправления после успешного создания.
+    """
+    model: Customer = Customer
+    form_class: CustomerForm = CustomerForm
+    template_name: str = 'customers-create.html'
+    permission_required: str = 'customers.can_add_customer'
+    success_url: str = reverse_lazy('customers:customer_list')
 
 
-@permission_required('customers.can_change_customer')
-def customer_update(request, pk):
-    customer = get_object_or_404(Customer, pk=pk)
-    if request.method == 'POST':
-        form = CustomerForm(request.POST, instance=customer)
-        if form.is_valid():
-            form.save()
-            return redirect('customers:customer_detail', pk=customer.pk)
-    else:
-        form = CustomerForm(instance=customer)
-    return render(request, 'customers-edit.html', {'form': form, 'object': customer})
+class CustomerUpdateView(PermissionRequiredMixin, UpdateView):
+    """
+    Представление для редактирования существующего клиента.
+
+    Attributes:
+        model (Customer): Модель для редактирования.
+        form_class (CustomerForm): Форма для редактирования клиента.
+        template_name (str): Имя шаблона для отображения.
+        context_object_name (str): Имя переменной контекста для объекта клиента.
+        permission_required (str): Необходимое разрешение для доступа к представлению.
+        success_url (str): URL для перенаправления после успешного редактирования.
+    """
+    model: Customer = Customer
+    form_class: CustomerForm = CustomerForm
+    template_name: str = 'customers-edit.html'
+    context_object_name: str = 'object'
+    permission_required: str = 'customers.can_change_customer'
+    success_url: str = reverse_lazy('customers:customer_list')
 
 
-@permission_required('customers.can_delete_customer')
-def customer_delete(request, pk):
-    customer = get_object_or_404(Customer, pk=pk)
-    if request.method == 'POST':
-        customer.delete()
-        return redirect('customers:customer_list')
-    return render(request, 'customers-delete.html', {'object': customer})
+class CustomerDeleteView(PermissionRequiredMixin, DeleteView):
+    """
+    Представление для удаления клиента.
+
+    Attributes:
+        model (Customer): Модель для удаления.
+        template_name (str): Имя шаблона для отображения.
+        context_object_name (str): Имя переменной контекста для объекта клиента.
+        permission_required (str): Необходимое разрешение для доступа к представлению.
+        success_url (str): URL для перенаправления после успешного удаления.
+    """
+    model: Customer = Customer
+    template_name: str = 'customers-delete.html'
+    context_object_name: str = 'object'
+    permission_required: str = 'customers.can_delete_customer'
+    success_url: str = reverse_lazy('customers:customer_list')

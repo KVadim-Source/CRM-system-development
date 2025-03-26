@@ -1,29 +1,79 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpRequest, HttpResponse
 from apps.products.models import Product
 from apps.ads.models import Advertisement
 from apps.leads.models import Lead
 from apps.customers.models import Customer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .permissions import IsAdmin
 
 
-def custom_logout(request):
-    logout(request)
-    return redirect('/accounts/login/')
+class UserView(APIView):
+    """
+    Представление для работы с пользователями.
+
+    Attributes:
+        permission_classes (list): Список разрешений для доступа к представлению.
+    """
+    permission_classes: list = [IsAdmin]
+
+    def get(self, request: HttpRequest) -> Response:
+        """
+        Возвращает список пользователей.
+
+        Args:
+            request (HttpRequest): Запрос.
+
+        Returns:
+            Response: Ответ с сообщением.
+        """
+        return Response({"message": "Users list"})
+
+
+def custom_logout(request: HttpRequest) -> HttpResponse:
+    """
+    Выполняет выход пользователя из системы.
+
+    Args:
+        request (HttpRequest): Запрос.
+
+    Returns:
+        HttpResponse: Перенаправление на страницу входа или сообщение об ошибке.
+    """
+    try:
+        logout(request)
+        return redirect('/accounts/login/')
+    except Exception as e:
+        return HttpResponse("Ошибка при выходе из системы", status=500)
 
 
 @login_required
-def index(request):
-    products_count = Product.objects.count()
-    advertisements_count = Advertisement.objects.count()
-    leads_count = Lead.objects.count()
-    customers_count = Customer.objects.count()
+def index(request: HttpRequest) -> HttpResponse:
+    """
+    Отображает главную страницу с количеством объектов в системе.
 
-    context = {
-        'products_count': products_count,
-        'advertisements_count': advertisements_count,
-        'leads_count': leads_count,
-        'customers_count': customers_count,
-    }
+    Args:
+        request (HttpRequest): Запрос.
 
-    return render(request, 'users/index.html', context)
+    Returns:
+        HttpResponse: Ответ с шаблоном главной страницы или сообщение об ошибке.
+    """
+    try:
+        products_count: int = Product.objects.count()
+        advertisements_count: int = Advertisement.objects.count()
+        leads_count: int = Lead.objects.count()
+        customers_count: int = Customer.objects.count()
+
+        context: dict = {
+            'products_count': products_count,
+            'advertisements_count': advertisements_count,
+            'leads_count': leads_count,
+            'customers_count': customers_count,
+        }
+
+        return render(request, 'users/index.html', context)
+    except Exception as e:
+        return HttpResponse("Ошибка при отображении главной страницы", status=500)

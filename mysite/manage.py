@@ -5,7 +5,18 @@ import sys
 import psycopg2
 
 
-def create_db_and_user():
+def create_db_and_user() -> None:
+    """
+    Создает базу данных и пользователя, если они не существуют.
+
+    Использует подключение к PostgreSQL для
+    проверки существования базы данных `crm_system`.
+    Если база данных отсутствует, она создается.
+
+    Raises:
+        psycopg2.Error: Если возникает ошибка
+        при подключении или выполнении SQL-запросов.
+    """
     conn = psycopg2.connect(
         dbname="postgres",
         user="postgres",
@@ -24,23 +35,42 @@ def create_db_and_user():
     conn.close()
 
 
-def create_superuser():
-    """Создание суперпользователя, если его нет."""
-    from django.contrib.auth.models import User
+def create_superuser() -> None:
+    """
+    Создает суперпользователя Django, если его нет.
+
+    Использует встроенную модель `User`
+    для проверки существования суперпользователя.
+    Если суперпользователь отсутствует,
+    он создается с заданными учетными данными.
+
+    Raises:
+        Exception: Если возникает ошибка при создании суперпользователя.
+    """
+    from apps.myauth.models import User
 
     try:
         if not User.objects.filter(is_superuser=True).exists():
             User.objects.create_superuser(
                 username='admin',
-                email='',
+                email='admin@example.com',
                 password='admin'
             )
+            print("Суперпользователь успешно создан")
     except Exception as e:
         print(f"Ошибка при создании суперпользователя: {e}")
 
 
 def main():
-    """Run administrative tasks."""
+    """
+    Запускает административные задачи Django.
+
+    Устанавливает настройки Django, создает базу данных и суперпользователя,
+    выполняет миграции, а затем передает управление стандартным командам Django.
+
+    Raises:
+        ImportError: Если Django не установлен или недоступен.
+    """
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings.prod')
 
     create_db_and_user()

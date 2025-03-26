@@ -1,77 +1,161 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import permission_required
+import os
+from typing import Optional
+from django.conf import settings
 from .models import Contract
 from .forms import ContractForm
-import os
-from django.conf import settings
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
-def checking_file(file):
+def checking_file(file) -> Optional[str]:
+    """
+    Проверяет наличие файла и возвращает уникальное имя файла.
+
+    Args:
+        file: Загружаемый файл.
+
+    Returns:
+        Optional[str]: Уникальное имя файла или None.
+    """
     if file:
         file_name, file_extension = os.path.splitext(file.name)
         media_path = os.path.join(settings.MEDIA_ROOT, file.name)
 
+        if not os.path.exists(media_path):
+            return file.name
+
         counter = 1
-        while os.path.exists(media_path):
+        while True:
             new_name = f"{file_name}_{counter}{file_extension}"
-            # media_path = os.path.join(settings.MEDIA_ROOT, new_name)
+            media_path = os.path.join(settings.MEDIA_ROOT, new_name)
+            if not os.path.exists(media_path):
+                return new_name
             counter += 1
-
-            return new_name
-    else:
-        return
+    return None
 
 
-@permission_required('contracts.can_view_contract')
-def contract_list(request):
-    contracts = Contract.objects.all()
-    return render(request, 'contracts-list.html', {'contracts': contracts})
+class ContractListView(PermissionRequiredMixin, ListView):
+    """
+    Представление для отображения списка контрактов.
+
+    Attributes:
+        model (Contract): Модель контракта.
+        template_name (str): Шаблон для отображения списка.
+        context_object_name (str): Имя контекста для списка контрактов.
+        permission_required (str): Разрешение для просмотра контрактов.
+    """
+    model: Contract = Contract
+    template_name: str = 'contracts-list.html'
+    context_object_name: str = 'contracts'
+    permission_required: str = 'contracts.can_view_contract'
 
 
-@permission_required('contracts.can_add_contract')
-def contract_create(request):
-    if request.method == 'POST':
-        form = ContractForm(request.POST, request.FILES)
-        if form.is_valid():
-            uploaded_file = request.FILES.get('document')
+class ContractDetailView(PermissionRequiredMixin, DetailView):
+    """
+    Представление для отображения деталей контракта.
+
+    Attributes:
+        model (Contract): Модель контракта.
+        template_name (str): Шаблон для отображения деталей.
+        context_object_name (str): Имя контекста для контракта.
+        permission_required (str): Разрешение для просмотра контракта.
+    """
+    model: Contract = Contract
+    template_name: str = 'contracts-detail.html'
+    context_object_name: str = 'contract'
+    permission_required: str = 'contracts.can_view_contract'
+
+
+class ContractCreateView(PermissionRequiredMixin, CreateView):
+    """
+    Представление для создания нового контракта.
+
+    Attributes:
+        model (Contract): Модель контракта.
+        form_class (ContractForm): Форма для создания контракта.
+        template_name (str): Шаблон для создания контракта.
+        permission_required (str): Разрешение для добавления контракта.
+    """
+    model: Contract = Contract
+    form_class: ContractForm = ContractForm
+    template_name: str = 'contracts-create.html'
+    permission_required: str = 'contracts.can_add_contract'
+
+    def form_valid(self, form) -> None:
+        """
+        Обработка формы при создании контракта.
+
+        Args:
+            form: Форма контракта.
+
+        Returns:
+            None
+        """
+        uploaded_file = self.request.FILES.get('document')
+        if uploaded_file:
             uploaded_file.name = checking_file(uploaded_file)
-
-            form.save()
-            return redirect('contracts:contract_list')
-    else:
-        form = ContractForm()
-    return render(request, 'contracts-create.html', {'form': form})
+        return super().form_valid(form)
 
 
-@permission_required('contracts.can_view_contract')
-def contract_detail(request, pk):
-    contract = get_object_or_404(Contract, pk=pk)
-    return render(request, 'contracts-detail.html', {'object': contract})
+class ContractUpdateView(PermissionRequiredMixin, UpdateView):
+    """
+    Представление для редактирования контракта.
+
+    Attributes:
+        model (Contract): Модель контракта.
+        form_class (ContractForm): Форма для редактирования контракта.
+        template_name (str): Шаблон для редактирования контракта.
+        permission_required (str): Разрешение для изменения контракта.
+    """
+    model: Contract = Contract
+    form_class: ContractForm = ContractForm
+    template_name: str = 'contracts-edit.html'
+    permission_required: str = 'contracts.can_change_contract'
+
+    def form_valid(self, form) -> None:
+        """
+        Обработка формы при редактировании контракта.
+
+        Args:
+            form: Форма контракта.
+
+        Returns:
+            None
+        """
+        uploaded_file = self.request.FILES.get('document')
+        if uploaded_file:
+            uploaded_file.name = checking_file(uploaded_file)
+        return super().form_valid(form)
 
 
-@permission_required('contracts.can_change_contract')
-def contract_update(request, pk):
-    contract = get_object_or_404(Contract, pk=pk)
-    if request.method == 'POST':
-        form = ContractForm(request.POST, request.FILES, instance=contract)
-        if form.is_valid():
-            uploaded_file = request.FILES.get('document')
-            if uploaded_file:
-                uploaded_file.name = checking_file(uploaded_file)
+class ContractDeleteView(PermissionRequiredMixin, DeleteView):
+    """
+    Представление для удаления контракта.
 
-            form.save()
-            return redirect('contracts:contract_detail', pk=contract.pk)
-    else:
-        form = ContractForm(instance=contract)
-    return render(request, 'contracts-edit.html', {'form': form, 'object': contract})
+    Attributes:
+        model (Contract): Модель контракта.
+        template_name (str): Шаблон для подтверждения удаления.
+        success_url (str): URL для перенаправления после удаления.
+        permission_required (str): Разрешение для удаления контракта.
+    """
+    model: Contract = Contract
+    template_name: str = 'contracts-delete.html'
+    success_url: str = '/contracts/'
+    permission_required: str = 'contracts.can_delete_contract'
 
+    def delete(self, request, *args, **kwargs) -> None:
+        """
+        Обработка удаления контракта.
 
-@permission_required('contracts.can_delete_contract')
-def contract_delete(request, pk):
-    contract = get_object_or_404(Contract, pk=pk)
-    if request.method == 'POST':
+        Args:
+            request: Запрос.
+            *args: Дополнительные аргументы.
+            **kwargs: Именованные аргументы.
+
+        Returns:
+            None
+        """
+        contract = self.get_object()
         if contract.document:
             contract.document.delete(save=False)
-        contract.delete()
-        return redirect('contracts:contract_list')
-    return render(request, 'contracts-delete.html', {'object': contract})
+        return super().delete(request, *args, **kwargs)
