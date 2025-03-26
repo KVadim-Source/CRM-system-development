@@ -1,12 +1,15 @@
-from django import forms
-from .models import Contract
 from typing import Type
+
+from django import forms
+
+from .models import Contract
 
 
 class ContractForm(forms.ModelForm):
     """
     Форма для создания или редактирования контракта.
     """
+
     class Meta:
         """
         Метаданные формы.
@@ -14,14 +17,14 @@ class ContractForm(forms.ModelForm):
         Attributes:
             model (Type[Contract]): Модель контракта.
             fields (list[str]): Поля, которые будут отображаться в форме.
-            widgets (dict): Виджеты для настройки отображения полей.
         """
-        model: Type[Contract] = Contract
+
+        model: type[Contract] = Contract
         fields: list[str] = [
-            'name', 'customer', 'product', 'advertisement',
-            'start_date', 'end_date', 'price', 'document'
+            "name",
+            "product",
+            "document",
+            "start_date",
+            "end_date",
+            "price"
         ]
-        widgets: dict[str, forms.DateInput] = {
-            'start_date': forms.DateInput(attrs={'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'type': 'date'}),
-        }

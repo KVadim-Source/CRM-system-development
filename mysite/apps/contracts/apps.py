@@ -13,9 +13,9 @@ class ContractsConfig(AppConfig):
         для отображения в админке.
     """
 
-    default_auto_field: str = 'django.db.models.BigAutoField'
-    name: str = 'apps.contracts'
-    verbose_name: str = 'Контракты'
+    default_auto_field: str = "django.db.models.BigAutoField"
+    name: str = "apps.contracts"
+    verbose_name: str = "Контракты"
 
     def ready(self) -> None:
         """

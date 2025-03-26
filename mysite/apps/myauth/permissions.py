@@ -8,6 +8,7 @@ class RolePermission(BasePermission):
     Attributes:
         role (str): Роль, для которой проверяется разрешение.
     """
+
     role: str
 
     def has_permission(self, request, view) -> bool:
@@ -19,7 +20,8 @@ class RolePermission(BasePermission):
             view: Представление.
 
         Returns:
-            bool: True, если пользователь имеет указанную роль, False иначе.
+            bool: True, если пользователь имеет указанную роль,
+            False иначе.
         """
         return request.user.role == self.role
 
@@ -28,25 +30,29 @@ class IsAdmin(RolePermission):
     """
     Разрешение для администраторов.
     """
-    role = 'admin'
+
+    role = "admin"
 
 
 class IsOperator(RolePermission):
     """
     Разрешение для операторов.
     """
-    role = 'operator'
+
+    role = "operator"
 
 
 class IsMarketer(RolePermission):
     """
     Разрешение для маркетологов.
     """
-    role = 'marketer'
+
+    role = "marketer"
 
 
 class IsManager(RolePermission):
     """
     Разрешение для менеджеров.
     """
-    role = 'manager'
+
+    role = "manager"

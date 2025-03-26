@@ -1,7 +1,10 @@
-from django import forms
-from .models import Customer
-from apps.leads.models import Lead
 from typing import Type
+
+from django import forms
+
+from apps.contracts.models import Contract
+
+from .models import Customer
 
 
 class CustomerForm(forms.ModelForm):
@@ -9,11 +12,13 @@ class CustomerForm(forms.ModelForm):
     Форма для создания или редактирования клиента.
 
     Attributes:
-        lead (ModelChoiceField): Поле выбора потенциального клиента.
+        contract (ModelChoiceField): Поле выбора контракта.
     """
-    lead: forms.ModelChoiceField = forms.ModelChoiceField(
-        queryset=Lead.objects.all(),
-        label='Лид'
+
+    contract = forms.ModelChoiceField(
+        queryset=Contract.objects.all(),
+        required=True,
+        label="Контракт"
     )
 
     class Meta:
@@ -24,5 +29,6 @@ class CustomerForm(forms.ModelForm):
             model (Type[Customer]): Связанная модель.
             fields (list[str]): Поля, доступные для редактирования.
         """
+
         model: Type[Customer] = Customer
-        fields: list[str] = ['lead', 'advertisement']
+        fields: list[str] = ["lead", "contract"]

@@ -10,5 +10,6 @@ class MyauthConfig(AppConfig):
         автоматически генерируемого первичного ключа.
         name (str): Путь к приложению.
     """
-    default_auto_field: str = 'django.db.models.BigAutoField'
-    name: str = 'apps.myauth'
+
+    default_auto_field: str = "django.db.models.BigAutoField"
+    name: str = "apps.myauth"

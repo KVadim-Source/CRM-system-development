@@ -1,10 +1,18 @@
 import os
 from typing import Optional
+
 from django.conf import settings
-from .models import Contract
-from .forms import ContractForm
-from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
+
+from .forms import ContractForm
+from .models import Contract
 
 
 def checking_file(file) -> Optional[str]:
@@ -44,10 +52,11 @@ class ContractListView(PermissionRequiredMixin, ListView):
         context_object_name (str): Имя контекста для списка контрактов.
         permission_required (str): Разрешение для просмотра контрактов.
     """
+
     model: Contract = Contract
-    template_name: str = 'contracts-list.html'
-    context_object_name: str = 'contracts'
-    permission_required: str = 'contracts.can_view_contract'
+    template_name: str = "contracts-list.html"
+    context_object_name: str = "contracts"
+    permission_required: str = "contracts.can_view_contract"
 
 
 class ContractDetailView(PermissionRequiredMixin, DetailView):
@@ -60,10 +69,11 @@ class ContractDetailView(PermissionRequiredMixin, DetailView):
         context_object_name (str): Имя контекста для контракта.
         permission_required (str): Разрешение для просмотра контракта.
     """
+
     model: Contract = Contract
-    template_name: str = 'contracts-detail.html'
-    context_object_name: str = 'contract'
-    permission_required: str = 'contracts.can_view_contract'
+    template_name: str = "contracts-detail.html"
+    context_object_name: str = "contract"
+    permission_required: str = "contracts.can_view_contract"
 
 
 class ContractCreateView(PermissionRequiredMixin, CreateView):
@@ -76,10 +86,11 @@ class ContractCreateView(PermissionRequiredMixin, CreateView):
         template_name (str): Шаблон для создания контракта.
         permission_required (str): Разрешение для добавления контракта.
     """
+
     model: Contract = Contract
     form_class: ContractForm = ContractForm
-    template_name: str = 'contracts-create.html'
-    permission_required: str = 'contracts.can_add_contract'
+    template_name: str = "contracts-create.html"
+    permission_required: str = "contracts.can_add_contract"
 
     def form_valid(self, form) -> None:
         """
@@ -91,7 +102,7 @@ class ContractCreateView(PermissionRequiredMixin, CreateView):
         Returns:
             None
         """
-        uploaded_file = self.request.FILES.get('document')
+        uploaded_file = self.request.FILES.get("document")
         if uploaded_file:
             uploaded_file.name = checking_file(uploaded_file)
         return super().form_valid(form)
@@ -107,10 +118,11 @@ class ContractUpdateView(PermissionRequiredMixin, UpdateView):
         template_name (str): Шаблон для редактирования контракта.
         permission_required (str): Разрешение для изменения контракта.
     """
+
     model: Contract = Contract
     form_class: ContractForm = ContractForm
-    template_name: str = 'contracts-edit.html'
-    permission_required: str = 'contracts.can_change_contract'
+    template_name: str = "contracts-edit.html"
+    permission_required: str = "contracts.can_change_contract"
 
     def form_valid(self, form) -> None:
         """
@@ -122,7 +134,7 @@ class ContractUpdateView(PermissionRequiredMixin, UpdateView):
         Returns:
             None
         """
-        uploaded_file = self.request.FILES.get('document')
+        uploaded_file = self.request.FILES.get("document")
         if uploaded_file:
             uploaded_file.name = checking_file(uploaded_file)
         return super().form_valid(form)
@@ -138,10 +150,11 @@ class ContractDeleteView(PermissionRequiredMixin, DeleteView):
         success_url (str): URL для перенаправления после удаления.
         permission_required (str): Разрешение для удаления контракта.
     """
+
     model: Contract = Contract
-    template_name: str = 'contracts-delete.html'
-    success_url: str = '/contracts/'
-    permission_required: str = 'contracts.can_delete_contract'
+    template_name: str = "contracts-delete.html"
+    success_url: str = "/contracts/"
+    permission_required: str = "contracts.can_delete_contract"
 
     def delete(self, request, *args, **kwargs) -> None:
         """

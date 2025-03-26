@@ -1,5 +1,6 @@
-from .models import Advertisement
 from typing import Dict
+
+from .models import Advertisement
 
 
 class AdvertisementStatsService:
@@ -26,7 +27,7 @@ class AdvertisementStatsService:
         """
         campaign = Advertisement.objects.with_stats().get(pk=campaign_id)
         return {
-            'leads_count': campaign.leads_count,
-            'customers_count': campaign.customers_count,
-            'profit': campaign.profit
+            "leads_count": campaign.leads_count,
+            "customers_count": campaign.customers_count,
+            "profit": campaign.profit,
         }

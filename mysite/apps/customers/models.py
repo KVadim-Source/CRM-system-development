@@ -1,6 +1,7 @@
 from django.db import models
+
+from apps.contracts.models import Contract
 from apps.leads.models import Lead
-from apps.ads.models import Advertisement
 
 
 class Customer(models.Model):
@@ -8,25 +9,24 @@ class Customer(models.Model):
     Модель клиента.
 
     Attributes:
-        lead (Lead): Потенциальный клиент, связанный с активным клиентом (OneToOneField).
-        advertisement (Advertisement): Рекламная кампания,
-        связанная с клиентом.
-        created_at (datetime): Дата создания клиента.
+        lead (Lead): Потенциальный клиент, связанный с
+        активным клиентом (OneToOneField).
+        contract (Contract): Контракт, связанный с клиентом.
     """
+
     lead: Lead = models.OneToOneField(
-        'leads.Lead',
+        "leads.Lead",
         on_delete=models.CASCADE,
-        verbose_name='Лид'
+        verbose_name="Потенциальный клиент",
+        related_name="customer_leads",
     )
-    advertisement: Advertisement = models.ForeignKey(
-        'ads.Advertisement',
+    contract: Contract = models.ForeignKey(
+        "contracts.Contract",
         on_delete=models.CASCADE,
-        related_name='customers',
-        verbose_name='Рекламная кампания'
-    )
-    created_at: models.DateTimeField = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Дата создания'
+        verbose_name="Контракт",
+        related_name="customer_contract",
+        null=True,
+        blank=True
     )
 
     class Meta:
@@ -38,8 +38,9 @@ class Customer(models.Model):
             verbose_name_plural (str): Название модели во множественном числе.
             permissions (list[tuple]): Кастомные разрешения для модели.
         """
-        verbose_name: str = 'Активный клиент'
-        verbose_name_plural: str = 'Активные клиенты'
+
+        verbose_name: str = "Активный клиент"
+        verbose_name_plural: str = "Активные клиенты"
         permissions: list[tuple[str, str]] = [
             ("can_view_customer", "Может просматривать клиентов"),
             ("can_add_customer", "Может добавлять клиентов"),
@@ -52,6 +53,6 @@ class Customer(models.Model):
         Возвращает строковое представление объекта.
 
         Returns:
-            str: Фамилия и имя лида, связанного с клиентом.
+            str: Фамилия и имя потенциального клиента, связанного с клиентом.
         """
-        return f'{self.lead.last_name} {self.lead.first_name}'
+        return f"{self.lead.last_name} {self.lead.first_name}"

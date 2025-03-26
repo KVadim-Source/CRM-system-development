@@ -1,9 +1,11 @@
 from decimal import Decimal
+
 from django.db import models
-from django.urls import reverse
-from django.db.models import Count, Sum, F, Case, When, DecimalField
-from apps.products.models import Product
+from django.db.models import Case, Count, DecimalField, F, Sum, When
 from django.db.models.functions import Round
+from django.urls import reverse
+
+from apps.products.models import Product
 
 
 class AdvertisementQuerySet(models.QuerySet):
@@ -19,17 +21,20 @@ class AdvertisementQuerySet(models.QuerySet):
             AdvertisementQuerySet: QuerySet с аннотированными данными.
         """
         return self.annotate(
-            leads_count=Count('leads', distinct=True),
-            customers_count=Count('customers', distinct=True),
-            contracts_sum=Sum('contracts_advertisements__price'),
+            leads_count=Count("leads", distinct=True),
+            customers_count=Count("leads__customer_leads", distinct=True),
+            contracts_sum=Sum(
+                "leads__customer_leads__contract__price",
+                output_field=models.DecimalField(max_digits=10, decimal_places=2),
+            ),
             profit=Round(
                 Case(
-                    When(budget=0, then=Decimal('0')),
-                    default=F('contracts_sum') / F('budget'),
-                    output_field=DecimalField(max_digits=10, decimal_places=2)
+                    When(budget=0, then=Decimal("0")),
+                    default=F("contracts_sum") / F("budget"),
+                    output_field=DecimalField(max_digits=10, decimal_places=2),
                 ),
-                2
-            )
+                2,
+            ),
         )
 
 
@@ -67,15 +72,18 @@ class Advertisement(models.Model):
         channel (str): Канал продвижения.
         budget (Decimal): Бюджет кампании.
     """
-    name: str = models.CharField(max_length=200, verbose_name='Название')
+
+    name: str = models.CharField(max_length=200, verbose_name="Название")
     product: Product = models.ForeignKey(
-        'products.Product',
+        "products.Product",
         on_delete=models.CASCADE,
-        verbose_name='Услуга',
-        related_name='advertisements'
+        verbose_name="Услуга",
+        related_name="advertisements",
     )
-    channel: str = models.CharField(max_length=100, verbose_name='Канал продвижения')
-    budget: Decimal = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Бюджет')
+    channel: str = models.CharField(max_length=100, verbose_name="Канал продвижения")
+    budget: Decimal = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Бюджет"
+    )
 
     objects = AdvertisementManager()
 
@@ -86,7 +94,7 @@ class Advertisement(models.Model):
         Returns:
             str: URL-адрес для детальной страницы кампании.
         """
-        return reverse('ads:advertisement_detail', args=[str(self.id)])
+        return reverse("ads:advertisement_detail", args=[str(self.id)])
 
     class Meta:
         """
@@ -97,8 +105,9 @@ class Advertisement(models.Model):
             verbose_name_plural (str): Название модели во множественном числе.
             permissions (list): Кастомные разрешения для модели.
         """
-        verbose_name: str = 'Рекламная кампания'
-        verbose_name_plural: str = 'Рекламные кампании'
+
+        verbose_name: str = "Рекламная кампания"
+        verbose_name_plural: str = "Рекламные кампании"
         permissions: list[tuple[str, str]] = [
             ("can_view_advertisement", "Может просматривать рекламные компании"),
             ("can_add_advertisement", "Может добавлять рекламные компании"),
