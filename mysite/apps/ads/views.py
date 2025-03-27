@@ -1,4 +1,6 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -28,7 +30,7 @@ class AdvertisementListView(PermissionRequiredMixin, ListView):
     model: Advertisement = Advertisement
     template_name: str = "ads-list.html"
     context_object_name: str = "ads"
-    permission_required: str = "ads.can_view_advertisement"
+    permission_required: str = "ads.view_advertisement"
 
 
 class AdvertisementStatisticView(PermissionRequiredMixin, ListView):
@@ -47,7 +49,7 @@ class AdvertisementStatisticView(PermissionRequiredMixin, ListView):
     model: Advertisement = Advertisement
     template_name: str = "ads-statistic.html"
     context_object_name: str = "ads"
-    permission_required: str = "ads.can_view_advertisement"
+    permission_required: str = "ads.view_advertisement"
 
     def get_queryset(self) -> AdvertisementQuerySet:
         """
@@ -60,7 +62,7 @@ class AdvertisementStatisticView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['ads'] = self.get_queryset()
+        context["ads"] = self.get_queryset()
         return context
 
 
@@ -80,7 +82,14 @@ class AdvertisementDetailView(PermissionRequiredMixin, DetailView):
     model: Advertisement = Advertisement
     template_name: str = "ads-detail.html"
     context_object_name: str = "object"
-    permission_required: str = "ads.can_view_advertisement"
+    permission_required: str = "ads.view_advertisement"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список рекламных кампаний.
+        """
+        return redirect(reverse_lazy("ads:advertisement_list"))
 
 
 class AdvertisementCreateView(PermissionRequiredMixin, CreateView):
@@ -100,7 +109,14 @@ class AdvertisementCreateView(PermissionRequiredMixin, CreateView):
     form_class: AdvertisementForm = AdvertisementForm
     template_name: str = "ads-create.html"
     success_url: str = reverse_lazy("ads:advertisement_list")
-    permission_required: str = "ads.can_add_advertisement"
+    permission_required: str = "ads.add_advertisement"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список рекламных кампаний.
+        """
+        return redirect(reverse_lazy("ads:advertisement_list"))
 
 
 class AdvertisementUpdateView(PermissionRequiredMixin, UpdateView):
@@ -119,7 +135,14 @@ class AdvertisementUpdateView(PermissionRequiredMixin, UpdateView):
     model: Advertisement = Advertisement
     form_class: AdvertisementForm = AdvertisementForm
     template_name: str = "ads-edit.html"
-    permission_required: str = "ads.can_change_advertisement"
+    permission_required: str = "ads.change_advertisement"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список рекламных кампаний.
+        """
+        return redirect(reverse_lazy("ads:advertisement_list"))
 
 
 class AdvertisementDeleteView(PermissionRequiredMixin, DeleteView):
@@ -137,4 +160,11 @@ class AdvertisementDeleteView(PermissionRequiredMixin, DeleteView):
     model: Advertisement = Advertisement
     template_name: str = "ads-delete.html"
     success_url: str = reverse_lazy("ads:advertisement_list")
-    permission_required: str = "ads.can_delete_advertisement"
+    permission_required: str = "ads.delete_advertisement"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список рекламных кампаний.
+        """
+        return redirect(reverse_lazy("ads:advertisement_list"))

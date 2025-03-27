@@ -7,7 +7,7 @@ from .models import Lead
 
 class LeadForm(forms.ModelForm):
     """
-    Форма для создания или редактирования потенциального клиента.
+    Форма для создания или редактирования лидов.
     """
 
     class Meta:

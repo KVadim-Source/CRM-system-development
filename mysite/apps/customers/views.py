@@ -1,4 +1,6 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -28,7 +30,14 @@ class CustomerListView(PermissionRequiredMixin, ListView):
     model: Customer = Customer
     template_name: str = "customers-list.html"
     context_object_name: str = "customers"
-    permission_required: str = "customers.can_view_customer"
+    permission_required: str = "customers.view_customer"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на главную страницу.
+        """
+        return redirect(reverse_lazy("index"))
 
 
 class CustomerDetailView(PermissionRequiredMixin, DetailView):
@@ -47,7 +56,14 @@ class CustomerDetailView(PermissionRequiredMixin, DetailView):
     model: Customer = Customer
     template_name: str = "customers-detail.html"
     context_object_name: str = "object"
-    permission_required: str = "customers.can_view_customer"
+    permission_required: str = "customers.view_customer"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список клиентов.
+        """
+        return redirect(reverse_lazy("customers:customer_list"))
 
 
 class CustomerCreateView(PermissionRequiredMixin, CreateView):
@@ -67,8 +83,15 @@ class CustomerCreateView(PermissionRequiredMixin, CreateView):
     model: Customer = Customer
     form_class: CustomerForm = CustomerForm
     template_name: str = "customers-create.html"
-    permission_required: str = "customers.can_add_customer"
+    permission_required: str = "customers.add_customer"
     success_url: str = reverse_lazy("customers:customer_list")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список клиентов.
+        """
+        return redirect(reverse_lazy("customers:customer_list"))
 
 
 class CustomerUpdateView(PermissionRequiredMixin, UpdateView):
@@ -91,8 +114,15 @@ class CustomerUpdateView(PermissionRequiredMixin, UpdateView):
     form_class: CustomerForm = CustomerForm
     template_name: str = "customers-edit.html"
     context_object_name: str = "object"
-    permission_required: str = "customers.can_change_customer"
+    permission_required: str = "customers.change_customer"
     success_url: str = reverse_lazy("customers:customer_list")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список клиентов.
+        """
+        return redirect(reverse_lazy("customers:customer_list"))
 
 
 class CustomerDeleteView(PermissionRequiredMixin, DeleteView):
@@ -113,5 +143,12 @@ class CustomerDeleteView(PermissionRequiredMixin, DeleteView):
     model: Customer = Customer
     template_name: str = "customers-delete.html"
     context_object_name: str = "object"
-    permission_required: str = "customers.can_delete_customer"
+    permission_required: str = "customers.delete_customer"
     success_url: str = reverse_lazy("customers:customer_list")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список клиентов.
+        """
+        return redirect(reverse_lazy("customers:customer_list"))

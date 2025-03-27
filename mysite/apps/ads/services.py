@@ -18,7 +18,7 @@ class AdvertisementStatsService:
 
         Returns:
             Dict[str, int | float]: Словарь с ключами:
-                - leads_count (int): Количество потенциальных клиентов.
+                - leads_count (int): Количество лидов.
                 - customers_count (int): Количество активных клиентов.
                 - profit (float): Соотношение контрактов к затратам.
 

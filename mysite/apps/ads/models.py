@@ -103,17 +103,10 @@ class Advertisement(models.Model):
         Attributes:
             verbose_name (str): Название модели в единственном числе.
             verbose_name_plural (str): Название модели во множественном числе.
-            permissions (list): Кастомные разрешения для модели.
         """
 
         verbose_name: str = "Рекламная кампания"
         verbose_name_plural: str = "Рекламные кампании"
-        permissions: list[tuple[str, str]] = [
-            ("can_view_advertisement", "Может просматривать рекламные компании"),
-            ("can_add_advertisement", "Может добавлять рекламные компании"),
-            ("can_change_advertisement", "Может изменять рекламные компании"),
-            ("can_delete_advertisement", "Может удалять рекламные компании"),
-        ]
 
     def __str__(self) -> str:
         """

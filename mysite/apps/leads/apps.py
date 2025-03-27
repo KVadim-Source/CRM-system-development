@@ -3,7 +3,7 @@ from django.apps import AppConfig
 
 class LeadsConfig(AppConfig):
     """
-    Конфигурация приложения "Потенциальные клиенты".
+    Конфигурация приложения "Лидов".
 
     Attributes:
         default_auto_field (str): Тип автоматически
