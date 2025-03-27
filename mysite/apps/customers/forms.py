@@ -16,9 +16,7 @@ class CustomerForm(forms.ModelForm):
     """
 
     contract = forms.ModelChoiceField(
-        queryset=Contract.objects.all(),
-        required=True,
-        label="Контракт"
+        queryset=Contract.objects.all(), required=True, label="Контракт"
     )
 
     class Meta:

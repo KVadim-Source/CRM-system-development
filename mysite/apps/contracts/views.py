@@ -3,6 +3,9 @@ from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -56,7 +59,14 @@ class ContractListView(PermissionRequiredMixin, ListView):
     model: Contract = Contract
     template_name: str = "contracts-list.html"
     context_object_name: str = "contracts"
-    permission_required: str = "contracts.can_view_contract"
+    permission_required: str = "contracts.view_contract"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на главную страницу.
+        """
+        return redirect(reverse_lazy('index'))
 
 
 class ContractDetailView(PermissionRequiredMixin, DetailView):
@@ -73,7 +83,14 @@ class ContractDetailView(PermissionRequiredMixin, DetailView):
     model: Contract = Contract
     template_name: str = "contracts-detail.html"
     context_object_name: str = "contract"
-    permission_required: str = "contracts.can_view_contract"
+    permission_required: str = "contracts.view_contract"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список контрактов.
+        """
+        return redirect(reverse_lazy("contract:contract_list"))
 
 
 class ContractCreateView(PermissionRequiredMixin, CreateView):
@@ -90,7 +107,7 @@ class ContractCreateView(PermissionRequiredMixin, CreateView):
     model: Contract = Contract
     form_class: ContractForm = ContractForm
     template_name: str = "contracts-create.html"
-    permission_required: str = "contracts.can_add_contract"
+    permission_required: str = "contracts.add_contract"
 
     def form_valid(self, form) -> None:
         """
@@ -107,6 +124,13 @@ class ContractCreateView(PermissionRequiredMixin, CreateView):
             uploaded_file.name = checking_file(uploaded_file)
         return super().form_valid(form)
 
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список контрактов.
+        """
+        return redirect(reverse_lazy("contract:contract_list"))
+
 
 class ContractUpdateView(PermissionRequiredMixin, UpdateView):
     """
@@ -122,7 +146,7 @@ class ContractUpdateView(PermissionRequiredMixin, UpdateView):
     model: Contract = Contract
     form_class: ContractForm = ContractForm
     template_name: str = "contracts-edit.html"
-    permission_required: str = "contracts.can_change_contract"
+    permission_required: str = "contracts.change_contract"
 
     def form_valid(self, form) -> None:
         """
@@ -139,6 +163,13 @@ class ContractUpdateView(PermissionRequiredMixin, UpdateView):
             uploaded_file.name = checking_file(uploaded_file)
         return super().form_valid(form)
 
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список контрактов.
+        """
+        return redirect(reverse_lazy("contract:contract_list"))
+
 
 class ContractDeleteView(PermissionRequiredMixin, DeleteView):
     """
@@ -154,7 +185,7 @@ class ContractDeleteView(PermissionRequiredMixin, DeleteView):
     model: Contract = Contract
     template_name: str = "contracts-delete.html"
     success_url: str = "/contracts/"
-    permission_required: str = "contracts.can_delete_contract"
+    permission_required: str = "contracts.delete_contract"
 
     def delete(self, request, *args, **kwargs) -> None:
         """
@@ -172,3 +203,10 @@ class ContractDeleteView(PermissionRequiredMixin, DeleteView):
         if contract.document:
             contract.document.delete(save=False)
         return super().delete(request, *args, **kwargs)
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список контрактов.
+        """
+        return redirect(reverse_lazy("contract:contract_list"))

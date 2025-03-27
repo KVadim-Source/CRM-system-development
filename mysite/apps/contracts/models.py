@@ -1,13 +1,19 @@
+from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.urls import reverse
-from django.utils.timezone import now
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
+from django.utils.timezone import now
 
 from apps.products.models import Product
 
 
 def one_month_from_today():
+    """
+    Возвращает дату, которая находится через месяц от текущей даты.
+
+    Returns:
+        date: Дата через месяц от текущей.
+    """
     return timezone.now().date() + relativedelta(months=1)
 
 
@@ -41,10 +47,7 @@ class Contract(models.Model):
         max_digits=10, decimal_places=2, verbose_name="Сумма контракта", default=0.0
     )
     document: models.FileField | None = models.FileField(
-        upload_to="media",
-        verbose_name="Документ",
-        null=True,
-        blank=True
+        upload_to="media", verbose_name="Документ", null=True, blank=True
     )
 
     def get_absolute_url(self) -> str:
@@ -63,17 +66,10 @@ class Contract(models.Model):
         Attributes:
             verbose_name (str): Название модели в единственном числе.
             verbose_name_plural (str): Название модели во множественном числе.
-            permissions (list[tuple]): Кастомные разрешения для модели.
         """
 
         verbose_name: str = "Контракт"
         verbose_name_plural: str = "Контракты"
-        permissions: list[tuple[str, str]] = [
-            ("can_view_contract", "Может просматривать контракты"),
-            ("can_add_contract", "Может добавлять контракты"),
-            ("can_change_contract", "Может изменять контракты"),
-            ("can_delete_contract", "Может удалять контракты"),
-        ]
 
     def __str__(self) -> str:
         """

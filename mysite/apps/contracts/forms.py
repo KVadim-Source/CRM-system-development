@@ -26,5 +26,5 @@ class ContractForm(forms.ModelForm):
             "document",
             "start_date",
             "end_date",
-            "price"
+            "price",
         ]

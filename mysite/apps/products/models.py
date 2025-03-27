@@ -24,17 +24,10 @@ class Product(models.Model):
         Attributes:
             verbose_name (str): Название модели в единственном числе.
             verbose_name_plural (str): Название модели во множественном числе.
-            permissions (list[tuple]): Кастомные разрешения для модели.
         """
 
         verbose_name: str = "Услуга"
         verbose_name_plural: str = "Услуги"
-        permissions: list[tuple] = [
-            ("can_view_product", "Может просматривать продукт"),
-            ("can_add_product", "Может добавлять продукт"),
-            ("can_change_product", "Может изменять продукт"),
-            ("can_delete_product", "Может удалять продукт"),
-        ]
 
     def __str__(self) -> str:
         """

@@ -1,4 +1,6 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -28,7 +30,14 @@ class ProductListView(PermissionRequiredMixin, ListView):
     model: Product = Product
     template_name: str = "products-list.html"
     context_object_name: str = "products"
-    permission_required: str = "products.can_view_product"
+    permission_required: str = "products.view_product"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на главную страницу.
+        """
+        return redirect(reverse_lazy("index"))
 
 
 class ProductDetailView(PermissionRequiredMixin, DetailView):
@@ -47,7 +56,14 @@ class ProductDetailView(PermissionRequiredMixin, DetailView):
     model: Product = Product
     template_name: str = "products-detail.html"
     context_object_name: str = "object"
-    permission_required: str = "products.can_view_product"
+    permission_required: str = "products.view_product"
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список продуктов.
+        """
+        return redirect(reverse_lazy("products:product_list"))
 
 
 class ProductCreateView(PermissionRequiredMixin, CreateView):
@@ -67,8 +83,15 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
     model: Product = Product
     form_class: ProductForm = ProductForm
     template_name: str = "products-create.html"
-    permission_required: str = "products.can_add_product"
+    permission_required: str = "products.add_product"
     success_url: str = reverse_lazy("products:product_list")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список продуктов.
+        """
+        return redirect(reverse_lazy("products:product_list"))
 
 
 class ProductUpdateView(PermissionRequiredMixin, UpdateView):
@@ -91,8 +114,15 @@ class ProductUpdateView(PermissionRequiredMixin, UpdateView):
     form_class: ProductForm = ProductForm
     template_name: str = "products-edit.html"
     context_object_name: str = "object"
-    permission_required: str = "products.can_change_product"
+    permission_required: str = "products.change_product"
     success_url: str = reverse_lazy("products:product_list")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список продуктов.
+        """
+        return redirect(reverse_lazy("products:product_list"))
 
 
 class ProductDeleteView(PermissionRequiredMixin, DeleteView):
@@ -113,5 +143,12 @@ class ProductDeleteView(PermissionRequiredMixin, DeleteView):
     model: Product = Product
     template_name: str = "products-delete.html"
     context_object_name: str = "object"
-    permission_required: str = "products.can_delete_product"
+    permission_required: str = "products.delete_product"
     success_url: str = reverse_lazy("products:product_list")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        """
+        Переопределяет поведение при отсутствии разрешения.
+        Перенаправляет пользователя на список продуктов.
+        """
+        return redirect(reverse_lazy("products:product_list"))

@@ -1,36 +1,10 @@
-from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
     """
     Модель пользователя с расширенными полями.
-
-    Attributes:
-        role (str): Роль пользователя.
-        groups (ManyToManyField): Группы, в которых состоит пользователь.
-        user_permissions (ManyToManyField): Разрешения,
-        назначенные пользователю напрямую.
     """
-
-    ROLE_CHOICES: tuple = (
-        ("admin", "Admin"),
-        ("operator", "Operator"),
-        ("marketer", "Marketer"),
-        ("manager", "Manager"),
-    )
-
-    role: str = models.CharField(
-        max_length=10, choices=ROLE_CHOICES, default="operator"
-    )
-
-    groups: models.ManyToManyField = models.ManyToManyField(
-        Group, related_name="custom_user_set", blank=True
-    )
-
-    user_permissions: models.ManyToManyField = models.ManyToManyField(
-        Permission, related_name="custom_user_permissions_set", blank=True
-    )
 
     class Meta:
         """
